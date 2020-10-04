@@ -46,13 +46,30 @@ draw_all(Squares, WhitePos, BlackPos) :-
     draw_knight(BlackPos, black),
     send(@p, display, @ic, point(0, 0)).
 
+user_move(M) :-
+    new(D, dialog('Square to move to')),
+    send(D, append, new(TI, text_item(new_square, ''))),
+    send(D, append, button(ok, message(D, return, TI?selection))),
+    send(D, append, button(cancel, message(D, return, @nil))),
+    get(D, confirm, M),
+    send(D, destroy).
+
 play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
     sleep(0.2),
     moves(Board, WhitePos, Moves),
-    bestmove(Moves, NewWhitePos), !,
+(   repeat,
+    user_move(MS),
+    term_string(M, MS),
+    (
+        member(M, Moves), !
+        ;
+        fail
+    )
+),
+    %bestmove(Moves, _), !,
     delete(Board, WhitePos, NewBoard),
-    play(NewBoard, NewWhitePos, BlackPos, black).
+    play(NewBoard, M, BlackPos, black).
 
 play(Board, WhitePos, BlackPos, white) :-
     % No moves left    new(@Frame, frame('Black wins')),
