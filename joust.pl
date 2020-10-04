@@ -13,9 +13,16 @@ between2(Start, End, S2) :-
     name(S1, [C1]),
     between2(S1, End, S2).
 
+init_window(Width, Height):-
+    new(@p, picture('Joust')),
+    send(@p, ideal_width(Width)),
+    send(@p, ideal_height(Height)),
+    send(@p, open).
+
 % Generates starting positions
 % start(Board, WhitePos, BlackPos).
 init(Board, d/1, d/8) :-
+    init_window(1920, 1080),
     findall(X/Y, (between2(a, h, X), between(1, 8, Y)), Board).
 
 next_char(C, C1) :-
@@ -32,18 +39,16 @@ prev_char(C, C1) :-
 bestmove([X|_], X).
 
 draw_all(Squares, WhitePos, BlackPos) :-
-    free(@p),
-    new(@p, picture('Joust')),
-    send(@p, ideal_width(1920)),
-    send(@p, ideal_height(1080)),
+    free(@ic),
+    new(@ic, device),
     draw_squares(Squares),
     draw_knight(WhitePos, white),
     draw_knight(BlackPos, black),
-    send(@p, open).
+    send(@p, display, @ic, point(0, 0)).
 
 play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
-    %sleep(2),
+    sleep(0.2),
     moves(Board, WhitePos, Moves),
     bestmove(Moves, NewWhitePos), !,
     delete(Board, WhitePos, NewBoard),
@@ -59,7 +64,7 @@ play(Board, WhitePos, BlackPos, white) :-
 
 play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
-    %sleep(2),
+    sleep(0.2),
     moves(Board, BlackPos, Moves),
     bestmove(Moves, NewBlackPos), !,
     delete(Board, BlackPos, NewBoard),
@@ -130,13 +135,13 @@ draw_knight(X/Y, white) :-
     ord(X, Ord),
     GX is Ord * 100,
     GY is Y * -100,
-    send(@p, display, new(@Bitmap, bitmap('C:/white.jpg')), point(GX, GY)).
+    send(@ic, display, new(_, bitmap('C:/white.jpg')), point(GX, GY)).
 
 draw_knight(X/Y, black) :-
     ord(X, Ord),
     GX is Ord * 100,
     GY is Y * -100,
-    send(@p, display, new(@Bitmap, bitmap('C:/black.jpg')), point(GX, GY)).
+    send(@ic, display, new(_, bitmap('C:/black.jpg')), point(GX, GY)).
 
 
 
@@ -155,7 +160,7 @@ draw_squares([X/Y|Tail]) :-
     send(@Bo, y(GY)),
     square_colour(X/Y, Colour),
     send(@Bo, fill_pattern, colour(Colour)),
-    send(@p, display, @Bo),
+    send(@ic, display, @Bo),
     draw_squares(Tail).
 
 draw_squares([]).
