@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    html {
+      line-height: 1.7;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 40em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin-top: 1.7em;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.7em;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1.7em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1.7em 0 1.7em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      font-style: italic;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      background-color: #f0f0f0;
+      font-size: 85%;
+      margin: 0;
+      padding: .2em .4em;
+    }
+    pre {
+      line-height: 1.5em;
+      padding: 1em;
+      background-color: #f0f0f0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin-top: 1.7em;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+    }
+    th, td {
+      border-bottom: 1px solid lightgray;
+      padding: 1em 3em 1em 0;
+    }
+    header {
+      margin-bottom: 6em;
+      text-align: center;
+    }
+    nav a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="joust">Joust</h1>
+<p>Final project for course 20596: Prolog programming and aspects to artificial intelligence.<br />
+</p>
+<p><img src="images/cartoon.jpg" alt="Joust cartoon" width="500" class="center" /></p>
+<h2 id="background">Background</h2>
+<p>Joust is a two-player abstract strategy board game that may be considered a two-player variant of the knight’s tour. It may also be considered a chess variant. It uses a 8 x 8 checkered board, and two Chess knights as the only game pieces. Each player has one knight of a different color from the other player. The knights move as in the game of Chess, but the square it leaves (upon making a move) becomes “burned”, that is, it can no longer be moved upon. As the game progresses, fewer squares are available to be moved upon. The objective is to prevent your opponent’s knight from performing a move on its turn. (source: <a href="https://en.wikipedia.org/wiki/Knight%27s_tour#Joust">Wikipedia</a>)</p>
+<p>The start position of the game:</p>
+<p><img src="images/start.jpg" alt="Start game" width="500" /></p>
+<p>A possible endgame position. It is the white knight’s turn, but it has no where to move, therefore, the black knight wins.</p>
+<p><img src="images/end.jpg" alt="End game" width="500" /></p>
+<h2 id="how-to-play-the-game">How to play the game</h2>
+<ol type="1">
+<li>Install the <a href="https://www.swi-prolog.org/download/stable">latest stable release</a> of SWI-Prolog</li>
+<li>Run the <code>start.bat</code> file</li>
+<li>The game should start automatically. If for some reason it doesn’t, just type <code>joust.</code> from the SWI-Prolog interface.</li>
+<li>Once the game begins, left-click on a square to order your knight to go over.</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>The game has a configuration file simply named <code>config</code>, you can use any text editor to edit it and customize the game. Currently, the supported configuration options are: * <code>board_dimensions(X,Y)</code>: Sets the size of the game board. X and Y are assumed to be positive integer values. * <code>difficulty(Level)</code>: Sets the difficulty of the game. <code>Level</code> can by any of <code>novice</code>, <code>easy</code>, <code>medium</code>, <code>hard</code>, <code>ultra</code> or <code>demigod</code>.</p>
+<h2 id="ai">AI</h2>
+<p>The AI of the game is based on the Alpha-Beta algorithm as it appears on page 585 in the textbook, where black takes the role of the MAX player while white takes the role of the MIN player. The heuristic function <code>staticval</code> evaluates a given position as follows: * If it’s the white player’s turn and it has no legal moves, then the value is +1000 (guaranteed black win). * Otherwise (white has at least one move), if it’s the white player turn and black has no legal move to perform then the value is -1000 (guaranteed white win).</p>
+<p>The case for the black player is symmetric: * If it’s the black player’s turn and it has no legal moves, then the value is -1000 (guaranteed white win). * Otherwise (black has at least one move), if it’s the black player turn and white has no legal move to perform then the value is 1000 (guaranteed black win).</p>
+<p>For non-terminal game positions, the heuristic function simply estimates its value as the number of legal moves for the black - the number of legal moves for the white. Therefore, the algorithm should prefer positions for which black has plenty of options for continuation while white has fewer.</p>
+<p>For example, in the screenshot below we can see a state where the black knight has 7 possible moves, while the white knight has only 4. As a result, the heuristic function will evaluate this state as <code>7 - 4 = 3</code>.</p>
+<p><img src="images/staticval.jpg" alt="Heuristic function" width="500" /></p>
+<p>The difficulty of the game (see <a href="#Configuration">Configuration</a>) sets the maximal search depth of the game tree. The values corresponding to the different difficulty levels are summarized in the following table:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Difficulty</th>
+<th>Search depth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>novice</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>easy</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>medium</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>hard</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>ultra</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td>demigod</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>Based on some tests we’ve done, it’s possible to play the game of it’s highest difficulty (<code>demigod</code>) on 10x10 boards and expect the AI to make a move within a reasonable amount of time (usually couple of seconds).</p>
+<h2 id="source-code-organization">Source code organization</h2>
+<p>The project is comprised out of the following files and directories:<br />
+* <code>src/ai.pl</code>: Contains the implementation for the alpha-beta algorithm, as well as some auxillary predicates (<code>staticval</code>, <code>betterof</code>, etc.).<br />
+* <code>src/gui.pl</code>: Contains predicates for rendering the game board, handling user input, etc. Based on <a href="https://www.swi-prolog.org/packages/xpce/">XPCE</a>.<br />
+* <code>src/moves.pl</code>: Defines the legal moves for a knight on a chessboard.<br />
+* <code>src/joust.pl</code>: Main game logic. Responsible for GUI initialization, turn switching, annoncing the winner, etc.<br />
+* <code>start.bat</code>: A small batch script to kick off the game.<br />
+* <code>config</code>: Configuration file for the game (see <a href="#Configuration">Configuration</a>).<br />
+* <code>knights</code>: Directory that contains JPEG images of the knights used in the game.<br />
+* <code>images</code>: Directory that contains JPEG images referenced by this <code>README.md</code> file.<br />
+</p>
+<h2 id="authors">Authors</h2>
+<ul>
+<li>Assaf Carlsbad</li>
+<li>Igor Tsemakhovich</li>
+</ul>
+</body>
+</html>
