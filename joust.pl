@@ -148,25 +148,38 @@ ord(Char, Ord) :-
     name(Char, [Ord1|_]),
     Ord is Ord1 - 96.
 
-draw_knight(X/Y, white) :-
-    ord(X, Ord),
-    GX is Ord * 100,
-    GY is Y * -100,
-    send(@ic, display, new(_, bitmap('C:/white.jpg')), point(GX, GY)).
-
-draw_knight(X/Y, black) :-
-    ord(X, Ord),
-    GX is Ord * 100,
-    GY is Y * -100,
-    send(@ic, display, new(_, bitmap('C:/black.jpg')), point(GX, GY)).
-
-
-
 square_colour(X/Y, brown) :-
     ord(X, Ord),
     (Ord + Y) mod 2 =:= 0, !.
 
 square_colour(_, yellow).
+
+knight_pic_file_name(X/Y, white, 'C:/white_brown.jpg'):-
+    square_colour(X/Y, brown).
+    
+knight_pic_file_name(X/Y, black, 'C:/black_brown.jpg'):-
+    square_colour(X/Y, brown).
+
+knight_pic_file_name(X/Y, white, 'C:/white_yellow.jpg'):-
+    square_colour(X/Y, yellow).
+    
+knight_pic_file_name(X/Y, black, 'C:/black_yellow.jpg'):-
+    square_colour(X/Y, yellow).
+
+draw_knight(X/Y, Turn) :-
+    ord(X, Ord),
+    GX is Ord * 100,
+    GY is Y * -100,
+    knight_pic_file_name(X/Y, Turn, FileName),
+    send(@ic, display, new(_, bitmap(FileName)), point(GX, GY)).
+
+/*
+draw_knight(X/Y, black) :-
+    ord(X, Ord),
+    GX is Ord * 100,
+    GY is Y * -100,
+    send(@ic, display, new(_, bitmap('C:/black.jpg')), point(GX, GY)).
+*/
 
 draw_squares([X/Y|Tail]) :-
     new(@Bo, box(100, 100)),
