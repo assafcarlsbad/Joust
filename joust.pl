@@ -1,4 +1,5 @@
 :- use_module(library(pce)).
+:- dynamic user_choice/1.
 
 start :-
     init(Board, WhitePos, BlackPos),
@@ -47,20 +48,28 @@ draw_all(Squares, WhitePos, BlackPos) :-
     send(@p, display, @ic, point(0, 0)).
 
 user_move(M) :-
-    new(D, dialog('Square to move to')),
-    send(D, append, new(TI, text_item(new_square, ''))),
-    send(D, append, button(ok, message(D, return, TI?selection))),
-    send(D, append, button(cancel, message(D, return, @nil))),
-    get(D, confirm, M),
-    send(D, destroy).
+    % new(D, dialog('Square to move to')),
+    % send(D, append, new(TI, text_item(new_square, ''))),
+    % send(D, append, button(ok, message(D, return, TI?selection))),
+    % send(D, append, button(cancel, message(D, return, @nil))),
+    % get(D, confirm, M),
+    % send(D, destroy).
+    repeat,
+    (
+        retract(user_choice(M)), !
+        ;
+        sleep(1),
+        fail
+    ).
+    
 
 play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
     sleep(0.2),
     moves(Board, WhitePos, Moves),
 (   repeat,
-    user_move(MS),
-    term_string(M, MS),
+    user_move(M),
+    % term_string(M, MS),
     (
         member(M, Moves), !
         ;
@@ -173,13 +182,8 @@ draw_knight(X/Y, Turn) :-
     knight_pic_file_name(X/Y, Turn, FileName),
     send(@ic, display, new(_, bitmap(FileName)), point(GX, GY)).
 
-/*
-draw_knight(X/Y, black) :-
-    ord(X, Ord),
-    GX is Ord * 100,
-    GY is Y * -100,
-    send(@ic, display, new(_, bitmap('C:/black.jpg')), point(GX, GY)).
-*/
+assert_user_choice(X, Y) :-
+    assertz(user_choice(X/Y)).
 
 draw_squares([X/Y|Tail]) :-
     new(@Bo, box(100, 100)),
@@ -191,6 +195,7 @@ draw_squares([X/Y|Tail]) :-
     square_colour(X/Y, Colour),
     send(@Bo, fill_pattern, colour(Colour)),
     send(@ic, display, @Bo),
+    send(@Bo, recogniser, click_gesture(left, '', single, message(@prolog, assert_user_choice, X, Y))),
     draw_squares(Tail).
 
 draw_squares([]).
