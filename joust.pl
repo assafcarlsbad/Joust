@@ -52,15 +52,14 @@ user_move(M) :-
     (
         retract(user_choice(M)), !
         ;
-        sleep(1),
+        sleep(0.2),
         fail
     ).
     
 
 play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
-    sleep(0.2),
-    moves(Board, WhitePos, Moves),
+    moves(Board, WhitePos, Moves), Moves \= [], !,
 (   repeat,
     user_move(M),
     (
@@ -73,7 +72,8 @@ play(Board, WhitePos, BlackPos, white) :-
     play(NewBoard, M, BlackPos, black).
 
 play(Board, WhitePos, BlackPos, white) :-
-    % No moves left    new(@Frame, frame('Black wins')),
+    % No moves left
+    new(@Frame, frame('Black wins')),
     send(@Frame, report, inform, 'Black wins!'),
     send(@Frame, report, done),
     draw_all(Board, WhitePos, BlackPos),
