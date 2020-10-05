@@ -73,10 +73,10 @@ play(Board, WhitePos, BlackPos, white) :-
 
 play(Board, WhitePos, BlackPos, white) :-
     % No moves left
+    draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('Black wins')),
     send(@Frame, report, inform, 'Black wins!'),
     send(@Frame, report, done),
-    draw_all(Board, WhitePos, BlackPos),
     !.
     %write('Black wins'), !.
 
@@ -89,10 +89,10 @@ play(Board, WhitePos, BlackPos, black) :-
     play(NewBoard, WhitePos, NewBlackPos, white).
 
 play(Board, WhitePos, BlackPos, black) :-
+    draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('White wins')),
     send(@Frame, report, inform, 'White wins!'),
     send(@Frame, report, done),
-    draw_all(Board, WhitePos, BlackPos),
     !.
 %    write('White wins'), !.
 
