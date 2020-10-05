@@ -55,7 +55,7 @@ user_move(M) :-
         sleep(0.2),
         fail
     ).
-    
+
 
 play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
@@ -155,16 +155,24 @@ square_colour(X/Y, brown) :-
 
 square_colour(_, yellow).
 
-knight_pic_file_name(X/Y, white, 'C:/white_brown.jpg'):-
-    square_colour(X/Y, brown).
-    
-knight_pic_file_name(X/Y, black, 'C:/black_brown.jpg'):-
+knight_pic_file_name(X/Y, white, Path):-
+    working_directory(CWD, CWD),
+    string_concat(CWD, "images/white_brown.jpg", Path),
     square_colour(X/Y, brown).
 
-knight_pic_file_name(X/Y, white, 'C:/white_yellow.jpg'):-
+knight_pic_file_name(X/Y, black, Path):-
+    working_directory(CWD, CWD),
+    string_concat(CWD, "images/black_brown.jpg", Path),
+    square_colour(X/Y, brown).
+
+knight_pic_file_name(X/Y, white, Path):-
+    working_directory(CWD, CWD),
+    string_concat(CWD, "images/white_yellow.jpg", Path),
     square_colour(X/Y, yellow).
-    
-knight_pic_file_name(X/Y, black, 'C:/black_yellow.jpg'):-
+
+knight_pic_file_name(X/Y, black, Path):-
+    working_directory(CWD, CWD),
+    string_concat(CWD, "images/black_yellow.jpg", Path),
     square_colour(X/Y, yellow).
 
 draw_knight(X/Y, Turn) :-
