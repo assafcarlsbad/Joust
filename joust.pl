@@ -31,6 +31,7 @@ between2(Start, End, S2) :-
     between2(S1, End, S2).
 
 init_window(Width, Height):-
+    free(@p),
     new(@p, picture('Joust')),
     send(@p, ideal_width(Width)),
     send(@p, ideal_height(Height)),
@@ -93,9 +94,10 @@ play(Board, WhitePos, BlackPos, white) :-
     draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('Black wins')),
     send(@Frame, report, inform, 'Black wins!'),
-    send(@Frame, report, done),
-    !.
-    %write('Black wins'), !.
+    % Causes problems - debug why.
+    % send(@Frame, report, done),
+    % Start another game.
+    start.
 
 play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
@@ -109,9 +111,11 @@ play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('White wins')),
     send(@Frame, report, inform, 'White wins!'),
-    send(@Frame, report, done),
-    !.
-%    write('White wins'), !.
+    % Causes problems - debug why.
+    %send(@Frame, report, done),
+    % Start another game.
+    start.
+
 
 
 % Generates a list of legal moves for the white
@@ -216,3 +220,16 @@ draw_squares([X/Y|Tail]) :-
     draw_squares(Tail).
 
 draw_squares([]).
+
+
+
+
+
+
+
+
+
+
+
+
+
