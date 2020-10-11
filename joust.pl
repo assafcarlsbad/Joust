@@ -1,7 +1,23 @@
 :- use_module(library(pce)).
 :- dynamic user_choice/1.
 
+read_game_config :-
+    see(config),
+    process_game_config,
+    seen.
+
+process_game_config :-
+    read(X),
+    process_config(X).
+
+process_config(end_of_file) :- !.
+
+process_config(X) :-
+    assert(X),
+    process_game_config.
+
 start :-
+    read_game_config,
     init(Board, WhitePos, BlackPos),
     play(Board, WhitePos, BlackPos, white).
 
@@ -15,6 +31,7 @@ between2(Start, End, S2) :-
     between2(S1, End, S2).
 
 init_window(Width, Height):-
+    free(@p),
     new(@p, picture('Joust')),
     send(@p, ideal_width(Width)),
     send(@p, ideal_height(Height)),
@@ -24,7 +41,8 @@ init_window(Width, Height):-
 % start(Board, WhitePos, BlackPos).
 init(Board, d/1, d/8) :-
     init_window(1920, 1080),
-    findall(X/Y, (between2(a, h, X), between(1, 8, Y)), Board).
+    board_dimensions(XMax, YMax),
+    findall(X/Y, (between2(a, XMax, X), between(1, YMax, Y)), Board).
 
 next_char(C, C1) :-
     name(C, [X|_]),
@@ -74,12 +92,13 @@ play(Board, WhitePos, BlackPos, white) :-
 
 play(Board, WhitePos, BlackPos, white) :-
     % No moves left
+    draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('Black wins')),
     send(@Frame, report, inform, 'Black wins!'),
-    send(@Frame, report, done),
-    draw_all(Board, WhitePos, BlackPos),
-    !.
-    %write('Black wins'), !.
+    % Causes problems - debug why.
+    % send(@Frame, report, done),
+    % Start another game.
+    start.
 
 play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
@@ -90,12 +109,14 @@ play(Board, WhitePos, BlackPos, black) :-
     play(NewBoard, WhitePos, NewBlackPos, white).
 
 play(Board, WhitePos, BlackPos, black) :-
+    draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('White wins')),
     send(@Frame, report, inform, 'White wins!'),
-    send(@Frame, report, done),
-    draw_all(Board, WhitePos, BlackPos),
-    !.
-%    write('White wins'), !.
+    % Causes problems - debug why.
+    %send(@Frame, report, done),
+    % Start another game.
+    start.
+
 
 
 % Generates a list of legal moves for the white
@@ -232,3 +253,16 @@ draw_squares([X/Y|Tail]) :-
     draw_squares(Tail).
 
 draw_squares([]).
+
+
+
+
+
+
+
+
+
+
+
+
+
