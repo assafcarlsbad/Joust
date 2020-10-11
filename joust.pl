@@ -1,7 +1,23 @@
 :- use_module(library(pce)).
 :- dynamic user_choice/1.
 
+read_game_config :-
+    see(config),
+    process_game_config,
+    seen.
+
+process_game_config :-
+    read(X),
+    process_config(X).
+
+process_config(end_of_file) :- !.
+
+process_config(X) :-
+    assert(X),
+    process_game_config.
+
 start :-
+    read_game_config,
     init(Board, WhitePos, BlackPos),
     play(Board, WhitePos, BlackPos, white).
 
@@ -24,7 +40,8 @@ init_window(Width, Height):-
 % start(Board, WhitePos, BlackPos).
 init(Board, d/1, d/8) :-
     init_window(1920, 1080),
-    findall(X/Y, (between2(a, h, X), between(1, 8, Y)), Board).
+    board_dimensions(XMax, YMax),
+    findall(X/Y, (between2(a, XMax, X), between(1, YMax, Y)), Board).
 
 next_char(C, C1) :-
     name(C, [X|_]),
