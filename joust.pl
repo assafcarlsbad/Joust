@@ -39,9 +39,11 @@ init_window(Width, Height):-
 
 % Generates starting positions
 % start(Board, WhitePos, BlackPos).
-init(Board, d/1, d/8) :-
+init(Board, Cmid/1, Cmid/YMax) :-
     init_window(1920, 1080),
     board_dimensions(XMax, YMax),
+    ord(a, A), ord(XMax, Z), XMid is (A + Z) // 2,
+    ord(Cmid, XMid),
     findall(X/Y, (between2(a, XMax, X), between(1, YMax, Y)), Board).
 
 next_char(C, C1) :-
@@ -168,8 +170,13 @@ move(X/Y, X2/Y1) :-
     Y1 is Y - 1.
 
 ord(Char, Ord) :-
-    name(Char, [Ord1|_]),
+    nonvar(Char), !,
+    name(Char, [Ord1]),
     Ord is Ord1 - 96.
+
+ord(Char, Ord) :-
+    Ord1 is Ord + 96,
+    name(Char, [Ord1]).
 
 square_colour(X/Y, brown) :-
     ord(X, Ord),
