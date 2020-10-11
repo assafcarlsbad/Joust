@@ -233,8 +233,9 @@ draw_horizontal_grid([X|Tail]):-
     draw_horizontal_grid(Tail).
 
 draw_grid :-
-    findall(X, between2(a, h, X), Horizontal),
-    findall(Y, between(1, 8, Y), Vertical),
+    board_dimensions(XMax, YMax),
+    findall(X, between2(a, XMax, X), Horizontal),
+    findall(Y, between(1, YMax, Y), Vertical),
     draw_vertical_grid(Vertical),
     draw_horizontal_grid(Horizontal).
     
