@@ -43,6 +43,7 @@ draw_all(Squares, WhitePos, BlackPos) :-
     free(@ic),
     new(@ic, device),
     draw_squares(Squares),
+    draw_grid(),
     draw_knight(WhitePos, white),
     draw_knight(BlackPos, black),
     send(@p, display, @ic, point(0, 0)).
@@ -184,6 +185,38 @@ draw_knight(X/Y, Turn) :-
 
 assert_user_choice(X, Y) :-
     assertz(user_choice(X/Y)).
+
+draw_vertical_grid([]):-!.
+draw_vertical_grid([Y|Tail]):-
+    new(@Bo, box(40, 100)),
+    GY is Y * -100,
+    send(@Bo, x(60)),
+    send(@Bo, y(GY)),
+    send(@Bo, fill_pattern, colour(white)),
+    send(@ic, display, @Bo),
+    send(@ic, display, new(T, text(Y, center, bold))),
+    send(T, center, @Bo?center),
+    draw_vertical_grid(Tail).
+
+draw_horizontal_grid([]):-!.
+draw_horizontal_grid([X|Tail]):-
+    new(@Bo, box(100, 40)),
+    ord(X, Ord),
+    GX is Ord * 100,
+    send(@Bo, x(GX)),
+    send(@Bo, y(0)),
+    send(@Bo, fill_pattern, colour(white)),
+    send(@ic, display, @Bo),
+    send(@ic, display, new(T, text(X, center, bold))),
+    send(T, center, @Bo?center),
+    draw_horizontal_grid(Tail).
+
+draw_grid :-
+    findall(X, between2(a, h, X), Horizontal),
+    findall(Y, between(1, 8, Y), Vertical),
+    draw_vertical_grid(Vertical),
+    draw_horizontal_grid(Horizontal).
+    
 
 draw_squares([X/Y|Tail]) :-
     new(@Bo, box(100, 100)),
