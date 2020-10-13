@@ -19,7 +19,7 @@ process_config(X) :-
 start :-
     read_game_config,
     init(Board, WhitePos, BlackPos),
-    play(Board, WhitePos, BlackPos, white).
+    play(state(Board, WhitePos, BlackPos, white)).
 
 init_window(Width, Height):-
     free(@p),
@@ -36,15 +36,6 @@ init(Board, XMid/1, XMid/YMax) :-
     XMid is (1 + XMax) // 2,
     findall(X/Y, (between(1, XMax, X), between(1, YMax, Y)), Board).
 
-next_char(C, C1) :-
-    name(C, [X|_]),
-    X1 is X + 1,
-    name(C1, [X1]).
-
-prev_char(C, C1) :-
-    name(C, [X|_]),
-    X1 is X - 1,
-    name(C1, [X1]).
 
 % For now just pick the first one
 bestmove([X|_], X).
@@ -68,21 +59,20 @@ user_move(M) :-
     ).
 
 
-play(Board, WhitePos, BlackPos, white) :-
+play(state(Board, WhitePos, BlackPos, white)) :-
     draw_all(Board, WhitePos, BlackPos),
-    moves(Board, WhitePos, Moves), Moves \= [], !,
+    moves(state(Board, WhitePos, BlackPos, white), Moves), !,
 (   repeat,
     user_move(M),
     (
-        member(M, Moves), !
+        member(state(Board1, M, BlackPos, black), Moves), !
         ;
         fail
     )
 ),
-    delete(Board, WhitePos, NewBoard),
-    play(NewBoard, M, BlackPos, black).
+    play(state(Board1, M, BlackPos, black)).
 
-play(Board, WhitePos, BlackPos, white) :-
+play(state(Board, WhitePos, BlackPos, white)) :-
     % No moves left
     draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('Black wins')),
@@ -92,15 +82,14 @@ play(Board, WhitePos, BlackPos, white) :-
     % Start another game.
     start.
 
-play(Board, WhitePos, BlackPos, black) :-
+play(state(Board, WhitePos, BlackPos, black)) :-
     draw_all(Board, WhitePos, BlackPos),
     sleep(0.2),
-    moves(Board, BlackPos, Moves),
-    bestmove(Moves, NewBlackPos), !,
-    delete(Board, BlackPos, NewBoard),
-    play(NewBoard, WhitePos, NewBlackPos, white).
+    moves(state(Board, WhitePos, BlackPos, black), Moves),
+    bestmove(Moves, BestMove), !,
+    play(BestMove).
 
-play(Board, WhitePos, BlackPos, black) :-
+play(state(Board, WhitePos, BlackPos, black)) :-
     draw_all(Board, WhitePos, BlackPos),
     new(@Frame, frame('White wins')),
     send(@Frame, report, inform, 'White wins!'),
@@ -110,54 +99,68 @@ play(Board, WhitePos, BlackPos, black) :-
     start.
 
 
+% state(Board, WhitePos, BlackPos, Turn)
+% Board - list of tiles of the form X/Y
+% WhitePos, BlackPos - tile where white and black players stand,
+% respectively
+% Turn - an atom which can take the values { white, black }
 
-% Generates a list of legal moves for the white
-moves(Board, X/Y, L) :-
-    findall(NewPos, (move(X/Y, NewPos), member(NewPos, Board)), L).
-
-% Move North-East
-move(X/Y, X1/Y1) :-
-    next_char(X, X1),
+knight_move(X/Y, X1/Y1) :-
+    % Move North-East.
+    X1 is X + 1,
     Y1 is Y + 2.
 
-% Move North-West
-move(X/Y, X1/Y1) :-
-    prev_char(X, X1),
+knight_move(X/Y, X1/Y1) :-
+    % Move East-North.
+    X1 is X + 2,
+    Y1 is Y + 1.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move East-South.
+    X1 is X + 2,
+    Y1 is Y - 1.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move South-East.
+    X1 is X + 1,
+    Y1 is Y - 2.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move North-West.
+    X1 is X - 1,
+    Y1 is Y - 2.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move West-South.
+    X1 is X - 2,
+    Y1 is Y - 1.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move West-North.
+    X1 is X - 2,
+    Y1 is Y + 1.
+
+knight_move(X/Y, X1/Y1) :-
+    % Move North-West.
+    X1 is X - 1,
     Y1 is Y + 2.
 
-% Move West-North
-move(X/Y, X2/Y1) :-
-    prev_char(X, X1),
-    prev_char(X1, X2),
-    Y1 is Y + 1.
+move(state(Board, WhitePos, BlackPos, white), state(Board1, WhitePos1, BlackPos, black)) :-
+    % White moves.
+    delete(Board, WhitePos, Board1),
+    knight_move(WhitePos, WhitePos1),
+    member(WhitePos1, Board1).
 
-% Move West-South
-move(X/Y, X2/Y1) :-
-    prev_char(X, X1),
-    prev_char(X1, X2),
-    Y1 is Y - 1.
+move(state(Board, WhitePos, BlackPos, black), state(Board1, WhitePos, BlackPos1, white)) :-
+    % Black moves.
+    delete(Board, BlackPos, Board1),
+    knight_move(BlackPos, BlackPos1),
+    member(BlackPos1, Board1).
 
-% Move South-West
-move(X/Y, X1/Y1) :-
-    prev_char(X, X1),
-    Y1 is Y - 2.
-
-% Move South-East
-move(X/Y, X1/Y1) :-
-    next_char(X, X1),
-    Y1 is Y - 2.
-
-% Move East-North
-move(X/Y, X2/Y1) :-
-    next_char(X, X1),
-    next_char(X1, X2),
-    Y1 is Y + 1.
-
-% Move East-South
-move(X/Y, X2/Y1) :-
-    next_char(X, X1),
-    next_char(X1, X2),
-    Y1 is Y - 1.
+% Generates a list of all legal moves from a given state.
+% Fails if no moves are legal.
+moves(State, [M1|Ms]) :-
+    findall(State1, move(State, State1), [M1|Ms]).
 
 square_colour(X/Y, brown) :-
     (X + Y) mod 2 =:= 0, !.
@@ -206,7 +209,7 @@ draw_vertical_grid([Y|Tail]):-
     draw_vertical_grid(Tail).
 
 chr(C, N) :-
-    N1 is N + 64,
+    N1 is N + 64, % 64 is uppercase 'A'
     name(C, [N1]).
 
 draw_horizontal_grid([]):-!.
