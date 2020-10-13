@@ -1,4 +1,9 @@
-:- module(moves, [moves/2]).
+:- module(moves, [moves/2, turn/2]).
+
+turn(State, Turn) :-
+    % A game state is represented as a 4-member object:
+    % state(Board, WhitePos, BlackPos, Turn).
+    arg(4, State, Turn).
 
 knight_move(X/Y, X1/Y1) :-
     % Move North-East.

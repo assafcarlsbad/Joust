@@ -1,5 +1,6 @@
 :- use_module(library(pce)).
 :- use_module(moves).
+:- use_module(ai).
 :- dynamic user_choice/1.
 
 read_game_config :-
@@ -36,10 +37,6 @@ init(Board, XMid/1, XMid/YMax) :-
     board_dimensions(XMax, YMax),
     XMid is (1 + XMax) // 2,
     findall(X/Y, (between(1, XMax, X), between(1, YMax, Y)), Board).
-
-
-% For now just pick the first one
-bestmove([X|_], X).
 
 draw_all(Squares, WhitePos, BlackPos) :-
     free(@ic),
@@ -86,8 +83,10 @@ play(state(Board, WhitePos, BlackPos, white)) :-
 play(state(Board, WhitePos, BlackPos, black)) :-
     draw_all(Board, WhitePos, BlackPos),
     sleep(0.2),
-    moves(state(Board, WhitePos, BlackPos, black), Moves),
-    bestmove(Moves, BestMove), !,
+    % moves(state(Board, WhitePos, BlackPos, black), Moves),
+    % bestmove(Moves, BestMove), !,
+    minmax(state(Board, WhitePos, BlackPos, black), BestMove, 2, _),
+    nonvar(BestMove), !,
     play(BestMove).
 
 play(state(Board, WhitePos, BlackPos, black)) :-
@@ -191,16 +190,3 @@ draw_squares([X/Y|Tail]) :-
     draw_squares(Tail).
 
 draw_squares([]).
-
-
-
-
-
-
-
-
-
-
-
-
-
