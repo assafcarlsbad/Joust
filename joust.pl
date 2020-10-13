@@ -3,6 +3,15 @@
 :- use_module(ai).
 :- dynamic user_choice/1.
 
+search_depth(1) :-
+    difficulty(easy).
+search_depth(2) :-
+    difficulty(medium).
+search_depth(3) :-
+    difficulty(hard).
+search_depth(4) :-
+    difficulty(ultra).
+
 read_game_config :-
     see(config),
     process_game_config,
@@ -85,7 +94,8 @@ play(state(Board, WhitePos, BlackPos, black)) :-
     sleep(0.2),
     % moves(state(Board, WhitePos, BlackPos, black), Moves),
     % bestmove(Moves, BestMove), !,
-    minmax(state(Board, WhitePos, BlackPos, black), BestMove, 2, _),
+    search_depth(D),
+    minmax(state(Board, WhitePos, BlackPos, black), BestMove, D, _),
     nonvar(BestMove), !,
     play(BestMove).
 
