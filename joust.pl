@@ -21,15 +21,6 @@ start :-
     init(Board, WhitePos, BlackPos),
     play(Board, WhitePos, BlackPos, white).
 
-between2(Start, Start, Start) :- !.
-between2(Start, End, Start) :- Start @< End.
-between2(Start, End, S2) :-
-    Start @< End,
-    name(Start, [C]),
-    C1 is C + 1,
-    name(S1, [C1]),
-    between2(S1, End, S2).
-
 init_window(Width, Height):-
     free(@p),
     new(@p, picture('Joust')),
@@ -39,12 +30,11 @@ init_window(Width, Height):-
 
 % Generates starting positions
 % start(Board, WhitePos, BlackPos).
-init(Board, Cmid/1, Cmid/YMax) :-
+init(Board, XMid/1, XMid/YMax) :-
     init_window(1920, 1080),
     board_dimensions(XMax, YMax),
-    ord(a, A), ord(XMax, Z), XMid is (A + Z) // 2,
-    ord(Cmid, XMid),
-    findall(X/Y, (between2(a, XMax, X), between(1, YMax, Y)), Board).
+    XMid is (1 + XMax) // 2,
+    findall(X/Y, (between(1, XMax, X), between(1, YMax, Y)), Board).
 
 next_char(C, C1) :-
     name(C, [X|_]),
@@ -169,18 +159,8 @@ move(X/Y, X2/Y1) :-
     next_char(X1, X2),
     Y1 is Y - 1.
 
-ord(Char, Ord) :-
-    nonvar(Char), !,
-    name(Char, [Ord1]),
-    Ord is Ord1 - 96.
-
-ord(Char, Ord) :-
-    Ord1 is Ord + 96,
-    name(Char, [Ord1]).
-
 square_colour(X/Y, brown) :-
-    ord(X, Ord),
-    (Ord + Y) mod 2 =:= 0, !.
+    (X + Y) mod 2 =:= 0, !.
 
 square_colour(_, yellow).
 
@@ -205,8 +185,7 @@ knight_pic_file_name(X/Y, black, Path):-
     square_colour(X/Y, yellow).
 
 draw_knight(X/Y, Turn) :-
-    ord(X, Ord),
-    GX is Ord * 100,
+    GX is X * 100,
     GY is Y * -100,
     knight_pic_file_name(X/Y, Turn, FileName),
     send(@ic, display, new(_, bitmap(FileName)), point(GX, GY)).
@@ -226,31 +205,34 @@ draw_vertical_grid([Y|Tail]):-
     send(T, center, @Bo?center),
     draw_vertical_grid(Tail).
 
+chr(C, N) :-
+    N1 is N + 64,
+    name(C, [N1]).
+
 draw_horizontal_grid([]):-!.
 draw_horizontal_grid([X|Tail]):-
     new(@Bo, box(100, 40)),
-    ord(X, Ord),
-    GX is Ord * 100,
+    GX is X * 100,
     send(@Bo, x(GX)),
     send(@Bo, y(0)),
     send(@Bo, fill_pattern, colour(white)),
     send(@ic, display, @Bo),
-    send(@ic, display, new(T, text(X, center, bold))),
+    chr(C, X),
+    send(@ic, display, new(T, text(C, center, bold))),
     send(T, center, @Bo?center),
     draw_horizontal_grid(Tail).
 
 draw_grid :-
     board_dimensions(XMax, YMax),
-    findall(X, between2(a, XMax, X), Horizontal),
+    findall(X, between(1, XMax, X), Horizontal),
     findall(Y, between(1, YMax, Y), Vertical),
     draw_vertical_grid(Vertical),
     draw_horizontal_grid(Horizontal).
-    
+
 
 draw_squares([X/Y|Tail]) :-
     new(@Bo, box(100, 100)),
-    ord(X, Ord),
-    GX is Ord * 100,
+    GX is X * 100,
     GY is Y * -100,
     send(@Bo, x(GX)),
     send(@Bo, y(GY)),
