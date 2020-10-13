@@ -105,11 +105,10 @@ play(Board, WhitePos, BlackPos, white) :-
 play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
     sleep(0.2),
-    minmax(Board, black, WhitePos, BlackPos, NextPos, _),
-    %moves(Board, BlackPos, Moves),
-    %bestmove(Moves, NewBlackPos), !,
+    moves(Board, BlackPos, Moves),
+    bestmove(Moves, NewBlackPos), !,
     delete(Board, BlackPos, NewBoard),
-    play(NewBoard, WhitePos, NextPos, white).
+    play(NewBoard, WhitePos, NewBlackPos, white).
 
 play(Board, WhitePos, BlackPos, black) :-
     draw_all(Board, WhitePos, BlackPos),
@@ -246,7 +245,7 @@ draw_grid :-
     findall(Y, between(1, YMax, Y), Vertical),
     draw_vertical_grid(Vertical),
     draw_horizontal_grid(Horizontal).
-
+    
 
 draw_squares([X/Y|Tail]) :-
     new(@Bo, box(100, 100)),
@@ -264,51 +263,9 @@ draw_squares([X/Y|Tail]) :-
 draw_squares([]).
 
 
-% AI related predicates
-staticval(Board, WhitePos, BlackPos, Val) :-
-    % Black is max
-    moves(Board, WhitePos, WhiteMoves),
-    moves(Board, BlackPos, BlackMoves),
-    length(WhiteMoves, WhiteLen),
-    length(BlackMoves, BlackLen),
-    Val is BlackLen - WhiteLen.
 
-minmax(Board, white, WhitePos, BlackPos, NextPos, Val) :-
-    moves(Board, white, WhitePos, PosList),
-    best(PosList, NextPos, Val)
-    ;
-    staticval(Board, WhitePos, BlackPos, Val).
 
-minmax(Board, black, WhitePos, BlackPos, NextPos, Val) :-
-    moves(Board, BlackPos, PosList),
-    best(PosList, black, NextPos, Val)
-    ;
-    staticval(Board, WhitePos, BlackPos, Val).
 
-opponent(white, black).
-opponent(black, white).
-
-% only one candidate
-best([Pos], Player, Pos, Val) :-
-    !,
-    opponent(Player, Opponent),
-    minmax(Pos, Opponent, _, Val).
-
-% several candidates
-best([Pos1|PosList], Player, BestPos, BestVal) :-
-    opponent(Player, Opponent),
-    minmax(Pos1, Opponent, _, Val1),
-    best(PosList, Opponent, Pos2, Val2),
-    betterof(Player, Pos1, Val1, Pos2, Val2, BestPos, BestVal).
-
-betterof(black, Pos1, Val1, Pos2, Val2, Pos1, Val1) :-
-    % black is max player
-    Val1 >= Val2, !.
-
-betterof(white, Pos1, Val1, Pos2, Val2, Pos1, Val1) :-
-    Val1 =< Val2, !.
-
-betterof(_, Pos1, Val1, Pos2, Val2, Pos2, Val2).
 
 
 
